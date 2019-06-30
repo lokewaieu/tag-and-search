@@ -3,7 +3,7 @@ This is an early attempt of a real life usage of a person search system. Person 
 
 Main features of this system include:
 * Real-time deep learning detection and re-identification inferencing using ONLY Intel Processors (~40fps+)
-* Web-based user interface for initiating person search, powered by a person detection backend for the selection of the query image
+* AI-Enable browser-based user interface (AUI) for initiating person search, powered by a person detection backend for the selection of the query image
 * Easily scalable to accomodate more cameras (2 cameras used in this)
 
 # Prerequisites
@@ -52,5 +52,19 @@ Server:
 ```
 ./server -m /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-detection-retail-0013/FP32/person-detection-retail-0013.xml -m_reid /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-reidentification-retail-0079/FP32/person-reidentification-retail-0079.xml
 ```
-
-
+# Using the AUI
+The AUI can be found here:
+```
+$ /surv_UI/index.html
+```
+IP address for MQTT can be changed here:
+```
+$ /surv_UI/mqtt2.js
+```
+3 Simple steps for navigating through the AUI:
+* Click pause when the person-of-interest comes into view
+* Hover mouse above the person-of-interest, a green bounding box should appear, highlighting the person
+* Click once on the person, this is to send the query image to the server in preparation for person re-identification
+* Then click Confirm to initiate person re-identification
+* Click Results to display search results, the results only show the top 3 matches from each camera
+* Person Search process is succesfully completed
