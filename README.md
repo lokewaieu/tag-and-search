@@ -1,10 +1,16 @@
 # Cross Camera Person Tag & Search using Person Detection and Person Re-identification
 This is an early attempt of a real life usage of a person search system. Person Search is loosely defined as a system where a camera is able to "remember" a newly seen person into its "memory" (known as Gallery) and subsequently, able to reidentify the same person if he is seen again. The method used in this system is a 2 step approach: First performing person detection, then performing person re-identification.
 
+The system consists of 3 basic components:
+* 1 Server
+* 1 or more cameras
+* 1 UI
+
 Main features of this system include:
 * Real-time deep learning detection and re-identification inferencing using ONLY Intel Processors (~40fps+)
 * AI-Enable browser-based user interface (AUI) for initiating person search, powered by a person detection backend for the selection of the query image
 * Easily scalable to accomodate more cameras (2 cameras used in this)
+* Flexible: Cameras and server can all be setup on a single PC, or individual PC for each component
 
 # Prerequisites
 1. Intel OpenVINO Toolkit: https://software.intel.com/en-us/openvino-toolkit/choose-download
