@@ -1,4 +1,4 @@
-# Cross Camera Person Tag & Search
+# Cross Camera Person Tag & Search using Person Detection and Person Re-identification
 This is an early attempt of a real life usage of a person search system. Person Search is loosely defined as a system where a camera is able to "remember" a newly seen person into its "memory" (known as Gallery) and subsequently, able to reidentify the same person if he is seen again. The method used in this system is a 2 step approach: First performing person detection, then performing person re-identification.
 
 Main features of this system include:
