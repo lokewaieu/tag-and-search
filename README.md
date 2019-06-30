@@ -67,7 +67,7 @@ IP address for MQTT can be changed here:
 ```
 $ /surv_UI/mqtt2.js
 ```
-3 Simple steps for navigating through the AUI:
+Steps for navigating through the AUI:
 * Click pause when the person-of-interest comes into view
 * Hover mouse above the person-of-interest, a green bounding box should appear, highlighting the person
 * Click once on the person, this is to send the query image to the server in preparation for person re-identification
