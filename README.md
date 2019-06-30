@@ -73,4 +73,4 @@ Steps for navigating through the AUI:
 * Click once on the person, this is to send the query image to the server in preparation for person re-identification
 * Then click Confirm to initiate person re-identification
 * Click Results to display search results, the results only show the top 3 matches from each camera
-* Person Search process is succesfully completed
+* Person Search process is successfully completed
