@@ -7,9 +7,9 @@ The system consists of 3 basic components:
 * 1 UI
 
 Main features of this system include:
-* Real-time deep learning detection and re-identification inferencing using ONLY Intel Processors (~40fps+)
-* AI-Enable browser-based user interface (AUI) for initiating person search, powered by a person detection backend for the selection of the query image
-* Easily scalable to accomodate more cameras (2 cameras used in this)
+* Fast: Real-time deep learning detection and re-identification inferencing using ONLY Intel Processors (~40fps+)
+* User Friendly: AI-Enable browser-based user interface (AUI) for initiating person search, powered by a person detection backend for the selection of the query image
+* Scalable: Easily add more cameras (2 cameras used in this)
 * Flexible: Cameras and server can all be setup on a single PC, or individual PC for each component
 
 # Prerequisites
