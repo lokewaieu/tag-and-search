@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Streamedian RTSP player example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	
+<style>
+    body {
+    max-width: 720px;
+    margin: 50px auto;
+    }
+
+    #myfullvideo1 {
+    width: 720px;
+    }
+
+    .controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    }
+    input.input, .form-inline .input-group>.form-control {
+    width: 300px;
+    }
+    .logs {
+    overflow: auto;
+    width: 720px;
+    height: 150px;
+    padding: 5px;
+    border-top: solid 1px gray;
+    border-bottom: solid 1px gray;
+    }
+    button {
+    margin: 5px
+    }
+</style>
+</head>
+<body>
+
+
+<video id="myfullvideo1" controls autoplay>
+    <!--<source src="rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov" type="application/x-rtsp">-->
+</video>
+
+
+<script src="free.player.1.8.4.js"></script> <!-- Path to player js-->
+
+<script type="text/javascript">
+	function StartVideo(){	
+		url1 = "rtsp://192.168.1.210/h264.sdp?res=full&x0=0&y0=0&x1=1920&y1=1080&qp=20&ratelimit=10000&doublescan=0&ssn=8374";
+		myfullvideo1.src = url1;
+		Streamedian.player('myfullvideo1', {socket:"ws://127.0.0.1:8080/ws/"});
+        var player1 = document.getElementById('myfullvideo1');
+	}
+
+	window.onload = function(){
+		
+	}
+	StartVideo();
+		
+</script>
+
+<!-- <script>
+    if (window.Streamedian) {
+        let errHandler = function(err){
+            alert(err.message);
+        };
+
+        let infHandler = function(inf) {
+            let sourcesNode = document.getElementById("sourcesNode");
+            let clients = inf.clients;
+            sourcesNode.innerHTML = "";
+
+            for (let client in clients) {
+                clients[client].forEach((sources) => {
+                    let nodeButton = document.createElement("button");
+                    nodeButton.setAttribute('data', sources.url + ' ' + client);
+                    nodeButton.appendChild(document.createTextNode(sources.description));
+                    nodeButton.onclick = (event)=> {
+                        setPlayerSource(event.target.getAttribute('data'));
+                    };
+                    sourcesNode.appendChild(nodeButton);
+                });
+            }
+        };
+
+        var playerOptions = {
+            socket: "ws://localhost:8088/ws/",            redirectNativeMediaErrors : true,
+            bufferDuration: 30,
+            errorHandler: errHandler,
+            infoHandler: infHandler
+        };
+
+        var html5Player  = document.getElementById("test_video");
+        var urlButton    = document.getElementById("set_new_url");
+        var urlEdit      = document.getElementById("stream_url");
+        var bufferRange  = document.getElementById("buffer_duration");
+        var bufferValue  = document.getElementById("buffer_value");
+
+        var player = Streamedian.player('test_video', playerOptions);
+        var nativePlayer = document.getElementById('test_video');
+        var range = document.getElementById('rate');
+        var set_live = document.getElementById('to_end');
+        var range_out = document.getElementById('rate_res');
+
+        range.addEventListener('input', function () {
+            nativePlayer.playbackRate = range.value;
+            range_out.innerHTML = `x${range.value}`;
+        });
+        set_live.addEventListener('click', function () {
+            range.value = 1.0;
+            range_out.innerHTML = `live`;
+            nativePlayer.playbackRate = 1;
+            nativePlayer.currentTime = nativePlayer.buffered.end(0);
+        });
+
+        var updateRangeControls = function(){
+            bufferRange.value     =  player.bufferDuration;
+            bufferValue.innerHTML = bufferRange.value + "sec.";
+        };
+
+        bufferRange.addEventListener('input', function(){
+            var iValue = parseInt(this.value, 10);
+            player.bufferDuration = iValue;
+            bufferValue.innerHTML = this.value + "sec.";
+        });
+
+        bufferRange.innerHTML = player.bufferDuration + "sec.";
+        updateRangeControls();
+
+        urlButton.onclick = ()=> {
+            setPlayerSource(urlEdit.value);
+        };
+
+        function setPlayerSource(newSource) {
+            player.destroy();
+            player = null;
+            html5Player.src = newSource;
+            player = Streamedian.player("test_video", playerOptions);
+            updateRangeControls();
+        }
+    }
+</script> -->
+</body>
+</html>

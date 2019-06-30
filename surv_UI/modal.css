@@ -1,0 +1,158 @@
+
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 50px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+/*    background-color: blue;*/ /* Fallback color */
+    background-color: rgba(0,0,0,0.85); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+/* Pause */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 60%;
+    max-width: 800px;
+    margin-top: 8%;
+    height: 580px;
+    background-color: rgb(60,60,60);
+}
+
+/* Modal Content (image) */
+/* Result */
+.modal-content2 {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 1000px;
+    margin-top: 8%;
+    height: 600px;
+    background-color: rgb(60,60,60);
+}
+
+/* Caption of Modal Image */
+#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 5px 0;
+    height: 150px;
+    font-family: sans-serif;
+}
+
+/* Add Animation */
+.modal-content,.modal-content2, #caption {    
+    animation-name: zoom;
+    animation-duration: 0.3s;
+}
+
+@keyframes zoom {
+    from {
+        transform:scale(0);
+        transform-origin: bottom right;
+    } 
+    to {
+        transform:scale(1);
+    }
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* The Close2 Button */
+.close2 {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close2:hover,
+.close2:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.modal_img{
+    width: 722px;
+    height: 440px; 
+    position: relative; 
+    margin-top: 10px;
+}
+
+.btn3{
+  position: absolute;
+  font-family: Hero-Bold;
+  background-color: #04E5BC;
+  letter-spacing: 0.1em;
+  width: 170px; 
+  font-size: 18px; 
+  letter-spacing: .5px; 
+  font-weight: normal; 
+  text-align: center; 
+  border-radius: 2px;
+  height: 50px; 
+  padding: 0 2rem; 
+  color: #fff;
+  margin-top: 10px;
+  margin-left: 320px;
+  border-style: none;
+  cursor: pointer;
+  transition: all 0.5s;
+}
+
+.btn3 span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.btn3 span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.btn3:hover span {
+  padding-right: 25px;
+}
+
+.btn3:hover span:after {
+  opacity: 1;
+  right: 0;
+}

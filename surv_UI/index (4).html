@@ -1,0 +1,1693 @@
+﻿OCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+  <script type="text/javascript" language="javascript">
+  	var mqtt;
+  	var reconnectTimeout=2000;
+  	var host="192.168.0.196";//change this
+  	var port= 1884;
+  	var livestream;
+  	var frame;
+  	var arr = [];
+  	var reid_frame;
+
+
+  	function onConnect(){
+  		console.log("Connected");
+  		// mqtt.subscribe("frame");
+  		mqtt.subscribe("frame");
+  		mqtt.subscribe("livestream");
+  		mqtt.subscribe("candidate");
+  		
+  		// mqtt.on('message',function(topic,message,packet){
+  		// 	if(topic === 'livestream'){
+  		// 		livestream = message;
+  		// 	}
+
+  		// 	if(topic === 'frame'){
+  		// 		frame = message;
+  		// 	}
+  		// });
+  		// message = new Paho.MQTT.Message("lol");
+  		// message.destinationName = "frame_cap";
+  		// mqtt.send(message);
+  	}
+
+  	function MQTTconnect(){
+  		console.log("connecting to"+ host + " " + port);
+  		mqtt=new Paho.MQTT.Client(host,port,"clientjs");
+  		var options = {
+  			timeout: 3,
+  			onSuccess: onConnect,
+  			onFailure: onFailure,
+  		};
+  		mqtt.onMessageArrived = onMessageArrived;
+  		mqtt.connect(options);
+  	}
+
+  	function onFailure(message){
+  		console.log("Connection Attempt to Host " + host + "Failed");
+  		setTimeout(MQTTconnect,reconnectTimeout)
+
+  	}
+
+  	function onMessageArrived(msg){
+  		if (msg.destinationName == "livestream"){
+  			var img = document.getElementById('video');
+			img.src = 'data:image/jpeg;base64,' + msg.payloadString;
+  			//livestream(); 
+
+  		}
+  		if(msg.destinationName == "frame"){
+  			console.log("frame received");
+  			var img = document.getElementById('img1');
+  			// console.log("Received Image");
+			img.src = 'data:image/jpeg;base64,' + msg.payloadString;
+  			
+  		}
+  		if(msg.destinationName == "candidate"){
+  			console.log("candidate received");
+  			var img = document.getElementById('candidate2');
+			img.src = 'data:image/jpeg;base64,' + msg.payloadString;
+			// reid_frame=msg.payloadString;
+  		}
+  		if(msg.destinationName == "re-id"){
+  			var myImage = new Image(220, 124);
+			myImage.src = 'data:image/jpeg;base64,' + msg.payloadString;
+			myImage.style.padding = "auto";
+			myImage.style.marginLeft = "10px";
+			myImage.style.marginRight = "10px";
+			myImage.style.marginTop = "10px";
+			myImage.style.border = "double";
+			output.appendChild(myImage);
+			myImage.addEventListener("click", function(e){
+				var modalImg2 = document.getElementById("img2");
+			        modal2.style.display = "block";
+    				modalImg2.src = this.src;
+   			});
+
+		}
+	}
+
+			
+
+  		// else if(msg.destinationName == "frame_cap"){
+  		// 	 console.log("onMessageArrived:"+msg.payloadString);	
+  		// }
+
+  		// console.log(msg.payloadString)
+
+  </script>
+  <style type="text/css">
+  	.img{
+  		margin-left: 10px;
+  		padding: 10px;
+  	}
+  </style>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- styles -->
+  <link href="assets/css/bootstrap.css" rel="stylesheet" />
+  <!-- <link href="assets/css/bootstrap-theme.css" rel="stylesheet" /> -->
+
+
+  <link href="assets/js/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+  <!-- <link href="assets/css/bootstrap-theme.css" rel="stylesheet" /> -->
+
+  <link href="assets/css/style.css" rel="stylesheet" />
+  <!-- <link href="assets/js/videojs/video-js.min.css" rel="stylesheet"> -->
+  <link type="text/css" rel="stylesheet" href="assets/materialize/css/materialize.min.css"  media="screen,projection"/>
+  <link href="assets/css/materialicon.css" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="assets/js/cropper/cropper.css">
+
+   <script src="assets/js/jquery.js"></script>
+
+  <script type="text/javascript" src="assets/materialize/js/materialize.min.js"></script>
+  <link href="main.css" rel="stylesheet">
+<!-- THIS IS FOR POP UP WINDOW -->
+ <!--  <style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 50px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    height: 780px;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+.aligncenter {
+	text-align: center;
+	margin-left: 80%;
+}
+</style> -->
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+#myImg {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 60%;
+    max-width: 800px;
+    height: 680px;
+}
+
+/* Caption of Modal Image */
+#caption {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    text-align: center;
+    color: #ccc;
+    padding: 10px 0;
+    height: 150px;
+}
+
+/* Add Animation */
+.modal-content, #caption {    
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.close2 {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close2:hover,
+.close2:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/*.close3 {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close3:hover,
+.close3:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+*/
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+    .modal-content {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+	<div id="navigation" class="navbar navbar-inverse navbar-fixed-top default" role="navigation">
+        <div class="container" style="width: 95.5%;">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><font size=6 style="color: #FFFFFF; margin-left: 11px">Dashboard</font></a> 
+			</div>
+			<div class="navigation">
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav navbar-right">
+						
+						<!-- <li><a href="#">About</a></li>
+						<li><a href="#">Contact</a></li> -->
+					</ul>
+				</div>
+			</div>
+        </div>
+	</div>
+
+	<section id="videoContent" class="section" style="margin-top: 2% ">
+		<div class="row videoContainer">
+			<div class="col-xs-12 col-md-4">
+
+				<!-- video table -->
+				<div id="videos" style=" margin-top: 11px; padding: 0 0 0 12px; height: 580px;"> 
+					<ul class="collapsible" data-collapsible="expandable" style="margin-top: 11px; margin: auto;">
+						<div class="collapsible-header active" style="outline: none; margin-left: 1px; margin-right: 11px"><h5>IP Camera 01</h5></div>
+					<div id="changeVideo">
+						<table class="videoTable">
+							<tbody>
+								<tr>
+									
+									<td class="videoTD" >
+										<canvas class='mycanvas' id='mycanvas1' style='position: absolute;'>Your browser does not support the HTML5 canvas tag.</canvas>
+										<span class='card-title home' id='camspan1' style = 'margin-left: 1%;position: absolute; z-index:3; color: #FFFFFF; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'></span>
+										<span class='card-title home' id='metaspan1' class="blinking" style = 'margin-top: 30%; margin-left: 35% ;position: absolute; z-index:3; text-shadow: -2px 0 red, 0 1px white, 2px 0 white, 0 -2px black; text-align: center; font-size:50px; color: 	#f24c59 ; font-family: Arial'></span>
+										<span class='card-title home' id='timespan1' style = 'margin-left: 72%;position: absolute; z-index:3; color: #FFFFFF; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'></span>
+										<div class="video-container" style="padding-bottom: 0%; height: 550px;">
+											<video class="myfullvideo" id="myfullvideo1" width= "100%" poster="assets/image/cam1.jpg" controls autoplay> Your browser does not support HTML5 video.</video>
+											<!-- <video id="myfullvideo1" width= "100%" class="myfullvideo" controls autoplay></video> -->
+											<!-- <img src="./HIHI.png" id = "video" class="myfullvideo" width= "100%" > -->
+										</div>
+
+										<!-- receive video -->
+										<!-- <script type="text/javascript">
+											function play() {
+										    mqtt.onMessageArrived = onMessageArrived;
+										}
+										</script> -->
+
+										<!-- <script>
+											  	function livestream(msg){
+											  		console.log("live");
+										  		var img = document.getElementById('video');
+												img.src = 'data:image/jpeg;base64,' + msg.payloadString;
+										  	}
+
+										</script> -->
+
+										<!-- <button onclick="removecoor()">Reset</button> -->
+
+										<!-- THIS IS FOR POP UP WINDOW -->
+										<!-- Trigger/Open The Modal -->
+
+										<div class="col s12" style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+											<button onclick = "dobtn1()" class="btn btn-primary" style="width:200px; background-color: #26ADE4" ><font size="4">PAUSE</font></button>
+											<button id="stopBtn" onclick = "stop1()" class="btn btn-primary" style="width:200px; background-color: #26ADE4" ><font size="4">STOP</font></button>
+										</div>
+
+										<!-- The Modal -->
+										<div id="myModal" class="modal">
+
+										  <!-- Modal content -->
+										  <div class="modal-content">
+										    <span class="close">&times;</span>
+										    <h5>Please select the target by clicking on it.</h5>
+										    <div onmousemove="showCoords(event)" onmouseout="clearCoor()" onclick="showclick(event)">
+										    <img id = "img1" src="https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg" padding-left="50px" height="550px" width="760px">   
+										    <canvas id="myCanvas" width="760px" height="550px" style="display:none; top: 8px; position: relative" ></canvas>
+										</div>
+										<div class="col s12" style="text-align: center;margin-top: 15px; margin-bottom: 0px">
+											<button id="showresult" class="btn btn-primary" style="text-align: center; background-color: #26ADE4"><font size="4">Confirm Target</font></button>
+										<!-- </div>  
+											<p id="demo" style:></p>
+											<p id="click"></p>
+										  </div> -->
+										</div>
+
+										<!-- Decode Image -->
+										<!-- <script>
+											  	function frame(msg){
+											  		console.log("frame")
+										  		var img = document.getElementById('img1');
+												img.src = 'data:image/jpeg;base64,' + msg.payloadString;
+										  	}
+										</script> -->
+										<!-- THIS IS FOR POP UP WINDOW -->
+										<script>
+										// Get the modal
+										
+										modal = document.getElementById('myModal');
+										canvas = document.getElementById('myCanvas');
+
+										// Get the button that opens the modal
+										var stp = document.getElementById("stopBtn");
+
+										// Get the <span> element that closes the modal
+										var span = document.getElementsByClassName("close")[0];
+
+										var okbtn = document.getElementById('close');
+
+										// When the user clicks the button, open the modal 
+										function dobtn1() {
+									        var myvideo = document.getElementById("myfullvideo1");
+									        //canvas = document.getElementById("myCanvas");
+									        ctx = canvas.getContext('2d');
+									        ctx.drawImage(myvideo, 0,0, 760, 550);
+											var img = document.getElementById("img1");
+									        var result = canvas.toDataURL();
+									        var slice = result.split(',')[1];
+									        // console.log(slice);
+									        img.src = 'data:image/jpeg;base64,' + slice;
+										   //  message = new Paho.MQTT.Message("1");
+										   //  message.destinationName = "pause_signal";
+									  		// mqtt.send(message);
+									  		// console.log(message);
+
+									  		message = new Paho.MQTT.Message(slice);
+										    message.destinationName = "frame_cap";
+									  		mqtt.send(message);
+									  		message = new Paho.MQTT.Message("1");
+										    message.destinationName = "pause_signal";
+									  		mqtt.send(message);
+									  		// console.log(message);
+									  		// var screenwidth = document.getElementById('img1').width;
+										  	// var screenheight = document.getElementById('img1').height;
+										  	message = new Paho.MQTT.Message("760"+','+"550");
+									  		message.destinationName = "frame_size";
+									  		mqtt.send(message);
+									  		var modal = document.getElementById("myModal");
+									        modal.style.display = "block";
+									  		// console.log(message);
+										}
+										function dobtn2(){
+									        var myvideo = document.getElementById("myfullvideo2");
+									        //canvas = document.getElementById("myCanvas");
+									        ctx = canvas.getContext('2d');
+									        ctx.drawImage(myvideo, 0,0, 760, 550);
+									        var img = document.getElementById("img1");
+									        
+									        
+									        var result = canvas.toDataURL(); 
+									        var slice = result.split(',')[1];
+									        // console.log(slice);
+									        img.src = 'data:image/jpeg;base64,' + slice;
+									  		message = new Paho.MQTT.Message(slice);
+										    message.destinationName = "frame_cap";
+									  		mqtt.send(message);
+									  		message = new Paho.MQTT.Message("1");
+										    message.destinationName = "pause_signal";
+									  		mqtt.send(message);
+										  	message = new Paho.MQTT.Message("760"+','+"550");
+									  		message.destinationName = "frame_size";
+									  		mqtt.send(message);
+									  		var modal = document.getElementById("myModal");
+									        modal.style.display = "block";
+									  		// console.log(message);
+										}
+
+										function stop1() {
+										    message = new Paho.MQTT.Message("STOP");
+										    message.destinationName = "stop_cam";
+									  		mqtt.send(message);
+									  		stopvideo1();
+										}
+
+										function stop2() {
+										    message = new Paho.MQTT.Message("STOP");
+										    message.destinationName = "stop_cam";
+									  		mqtt.send(message);
+									  		stopvideo2();
+										}
+
+										// okbtn.onclick = function() {
+										//     modal.style.display = "none";
+										// }
+
+										// When the user clicks on <span> (x), close the modal
+										span.onclick = function() {
+											message = new Paho.MQTT.Message("restart");
+											message.destinationName = "restart_cam";
+											mqtt.send(message);
+										    modal.style.display = "none";
+										   	// $('#img').attr('src', '')
+										}
+
+										// When the user clicks anywhere outside of the modal, close it
+										// window.onclick = function(event) {
+										//     if (event.target == modal) {
+										//     	message = new Paho.MQTT.Message("restart");
+										// 	    message.destinationName = "restart_cam";
+										//   		mqtt.send(message);
+										//         modal.style.display = "none";
+										//     }
+										// }
+										</script>
+										<script>
+										// var canvas = document.getElementById("myCanvas");
+										// var ctx = canvas.getContext("2d");
+										// 	//report the mouse position on click
+										// canvas.addEventListener("mousemove", function (evt) {
+										//     var mousePos = getMousePos(canvas, evt);
+										//     coor = (mousePos.x + ',' + mousePos.y);
+										//     document.getElementById("demo").innerHTML = coor;
+										//     var x = mousePos.x;
+										//     var y = mousePos.y;
+										//     message = new Paho.MQTT.Message(x.toString()+","+ y.toString());
+									 //  		message.destinationName = "mouse_coor";
+									 //  		mqtt.send(message);
+										// }, false);
+
+										// //Get Mouse Position
+										// function getMousePos(canvas, evt) {
+										//     var rect = canvas.getBoundingClientRect();
+										//     return {
+										//         x: evt.clientX - rect.left,
+										//         y: evt.clientY - rect.top
+										//     };
+										// }
+										function showCoords(event) {
+										    var x = event.clientX - 434;
+										    var y = event.clientY - 175;
+										    var coor = "X coords: " + x + ", Y coords: " + y;
+										    // document.getElementById("demo").innerHTML = coor;
+										    message = new Paho.MQTT.Message(x.toString()+","+ y.toString());
+									  		message.destinationName = "mouse_coor";
+									  		mqtt.send(message);
+										}
+
+										function showclick(event) {
+											var cX = event.clientX - 434;
+											var cY = event.clientY - 175;
+											var coor = "Client-X: " + cX + ", Client-Y: " + cY;
+											// document.getElementById("click").innerHTML = coor;
+											message = new Paho.MQTT.Message("1");
+									  		message.destinationName = "pause_signal2";
+									  		mqtt.send(message);
+									  		
+										}
+
+									  	showresult.onclick = function(msg){
+									  		message = new Paho.MQTT.Message("OK");
+										    message.destinationName = "ok_signal";
+									  		mqtt.send(message);
+									  		message = new Paho.MQTT.Message(re_id_person);
+										    message.destinationName = "re_id_person";
+										    // console.log(re_id_person);
+									  		mqtt.send(message);
+									  		modal.style.display = "none";
+									  		
+									  	}
+
+										function clearCoor() {
+										    // document.getElementById("demo").innerHTML = "";
+										}
+										</script>
+										<script>
+																			//--------------------
+								      // GET USER MEDIA CODE
+								      //--------------------
+								          navigator.getUserMedia = ( navigator.getUserMedia ||
+								                             navigator.webkitGetUserMedia ||
+								                             navigator.mozGetUserMedia ||
+								                             navigator.msGetUserMedia);
+
+								      var video;
+								      var webcamStream;
+
+								      function startWebcam() {
+								        if (navigator.getUserMedia) {
+								           navigator.getUserMedia (
+
+								              // constraints
+								              {
+								                 video: true,
+								                 audio: false
+								              },
+
+								              // successCallback
+								              function(localMediaStream) {
+								                  video = document.querySelector('video');
+								                 video.src = window.URL.createObjectURL(localMediaStream);
+								                 webcamStream = localMediaStream;
+								              },
+
+								              // errorCallback
+								              function(err) {
+								                 console.log("The following error occured: " + err);
+								              }
+								           );
+								        } else {
+								           console.log("getUserMedia not supported");
+								        }  
+								      }
+										</script>
+									</td>
+								</tr>
+						</tbody>
+					</table>
+				</div>
+			</ul>
+			</div>
+
+		</div>
+
+
+		<div class="row videoContainer">
+			<div class="col-xs-12 col-md-4">
+				<div id="videos" style=" margin-top: 8px; padding: 0 0 0 12px; height: 580px;"> 
+					<ul class="collapsible" data-collapsible="expandable" style="margin-top: 11px; margin: auto;">
+						<div class="collapsible-header active" style="outline: none; margin-left: 1px; margin-right: 11px;"><h5>IP Camera 02</h5></div>
+							<div id="changeVideo">
+								<table class="videoTable">
+									<tbody>
+										<tr>
+											
+											<td class="videoTD" >
+												<canvas class='mycanvas' id='mycanvas2' style='position: absolute;'>Your browser does not support the HTML5 canvas tag.</canvas>
+												<span class='card-title home' id='camspan2' style = 'margin-left: 1%;position: absolute; z-index:3; color: #FFFFFF; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'></span>
+												<span class='card-title home' id='metaspan2' class="blinking" style = 'margin-top: 30%; margin-left: 35% ;position: absolute; z-index:3; text-shadow: -2px 0 red, 0 1px white, 2px 0 white, 0 -2px black; text-align: center; font-size:50px; color: 	#f24c59 ; font-family: Arial'></span>
+												<span class='card-title home' id='timespan1' style = 'margin-left: 72%;position: absolute; z-index:3; color: #FFFFFF; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;'></span>
+												<div class="video-container" style="padding-bottom: 0%; height: 550px;">
+													<video class="myfullvideo" id="myfullvideo2" width= "100%" poster="assets/image/cam1.jpg" controls autoplay> Your browser does not support HTML5 video.</video>
+													<!-- <img src="./HIHI.png" id = "video" class="myfullvideo" width= "100%" > -->
+												</div>
+												<div class="col s12" style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+													<button class="btn btn-primary" onclick = "dobtn2()" style="width:200px; background-color: #26ADE4"><font size="4">PAUSE</font></button>
+													<button id="stopBtn" onclick = "stop2()" class="btn btn-primary" style="width:200px; background-color: #26ADE4"><font size="4">STOP</font></button>
+												</div>
+
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</ul>
+			</div>
+		</div>
+
+       	<div class="col-xs-6 col-md-4">
+			<ul class="collapsible" data-collapsible="expandable" style="margin-top: 11px;">
+				<li class="active">
+					<div class="collapsible-header active" style="outline: none; margin-left: 11px; margin-right: 11px;"><h5>Person of Interest</h5></div>
+					<div class="collapsible-body" active>
+						<div class="clearfix" style="height: 350px; padding: 0 0 0 0">
+							<div class="navbar-header" style="padding: 0 0 0 0; text-align: center">
+									<div style="width: 90%; margin-left: 5%">
+											<p class="aligncenter">
+												<img id = "candidate2" style="margin:auto;position:absolute;margin-top:80px;top:0;bottom:0;left:0;right:0;padding:0.5rem" src="https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg" height="300">
+											</p>
+									</div>
+							</div>
+						</div>
+					</div>
+				</li>
+
+
+				</script>
+				<li class="active" >
+					<span style = "background-color: red" class="new badge" id="notify1"></span>
+                	<div class="collapsible-header active" id="collapsibleControl" style="outline: none; margin-left: 11px; margin-right: 11px"><h5>ReID Result</h5> </div>
+                	<div class="collapsible-body" active>
+                		<div  class="clearfix" style = "overflow-y:scroll; height: 600px">
+							<!-- <div id= 'result1'>
+							</div> -->
+					<div class="row " id="output" style="padding: auto">
+
+                </div>
+
+
+							<!-- <div class='card'>
+							<div id="output"  class='card-image' style='padding: 2px 2px 2px 2px';
+						    background-color: powderblue"></div>
+						</div>
+						</div> -->
+							<!-- <div class="col s12" style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+								<button id="btnLoadMore1" class="btn btn-primary" style="width:200px; background-color: #26ADE4" onclick="loadmore(0)"><font size="4">Load More</font></button>
+							</div> -->
+						</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</section>
+<!-- The Modal -->
+<!-- <div id="myModal3" class="modal">
+	<div class="modal-content">
+  <span class="close3">&times;</span>
+    <br/>
+  <img id="img3" height="600px" style="margin:0; position:absolute;" >
+  <div id="caption"></div>
+</div>
+</div> -->
+<!-- <script>
+// Get the modal
+var modal3 = document.getElementById('myModal3');
+
+// Get the image and insert it inside the modal - use its "alt" text as a caption
+var img3 = document.getElementById('candidate2');
+var modalImg = document.getElementById("img3");
+img3.onclick = function(){
+    modal3.style.display = "block";
+    modalImg.src = this.src;
+}
+
+// Get the <span> element that closes the modal
+var span3 = document.getElementsByClassName("close3")[0];
+
+// When the user clicks on <span> (x), close the modal
+span3.onclick = function() { 
+    modal3.style.display = "none";
+}
+</script> -->
+
+
+<!-- The Modal -->
+<div id="myModal2" class="modal">
+	<div class="modal-content">
+  <span class="close2">&times;</span>
+  <h5>Re-ID Result</h5>
+  <img id = "img2" src="https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg" padding-left="50px" height="550px" width="760px">
+</div>
+<script>
+// Get the modal
+modal2 = document.getElementById('myModal2');
+var span2 = document.getElementsByClassName("close2")[0];
+
+// When the user clicks on <span> (x), close the modal
+span2.onclick = function() { 
+    modal2.style.display = "none";
+}
+</script>
+	<!-- <script type="text/javascript">
+		var img = new Image();
+		output.innerHTML = '';
+		output.appendChild(img);
+	</script> -->
+
+<!-- Modal Structure -->
+	<div id="modal1" class="modal modal-fixed-footer" top=3% style="width: 99%; height: 90%;" >
+		<div class="modal-content">
+			<h4>From Database</h4>
+			<div class="container" style="width: 100%">
+				<div class="row">
+					<div class="col s12 m9">
+						<div class="row">
+							<div id="test1" class="col s12" id="tab1">
+								<div class="row" id="modalRow1">
+									<ul class="collapsible" data-collapsible="expandable" id="ResultCamSection">
+										<li class='active'>
+											<div class = 'collapsible-header' id = 'header1' style = 'outline: none; background-color: black; color: white; border-radius: 5px; border: 1px solid black'>IPCAM 1 </div>
+											<div class = 'collapsible-body'> 
+												<div class='clearfix' >
+													<div class="col s12" style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+													</div>
+												</div>
+											</div>
+										</li>
+										<li class='active'>
+												<div class = 'collapsible-header' id = 'header2' style = 'outline: none; background-color: black; color: white; border-radius: 5px; border: 1px solid black'>IPCAM 2 </div>
+												<div class = 'collapsible-body'> 
+													<div class='clearfix' >
+														<div class="col s12" style="text-align: center;margin-top: 10px; margin-bottom: 10px">
+																<button id="btnLoadMore2" type="button" class="btn btn-primary" style="width:200px;" onclick="loadmore(1)">Load More</button>
+														</div>
+													</div>
+												</div>
+										</li>
+										
+										<li class='active'>
+												<div class = 'collapsible-header' id = 'header3' style = 'outline: none; background-color: black; color: white;border-radius: 5px; border: 1px solid black'>IPCAM 3 </div>
+												<div class = 'collapsible-body'> 
+													<div class='clearfix' >
+														<div class="col s12" style="text-align: center;margin-top: 10px ; margin-bottom: 10px">
+																<button id="btnLoadMore3" type="button" class="btn btn-primary" style="width:200px;" onclick="loadmore(2)">Load More</button>
+														</div>
+													</div>
+												</div>
+										</li>
+
+										<li class='active'>
+												<div class = 'collapsible-header' id = 'header4' style = 'outline: none; background-color: black; color: white;border-radius: 5px; border: 1px solid black'>IPCAM 4 </div>
+												<div class = 'collapsible-body'> 
+													<div class='clearfix'>
+														<div class="col s12" style="text-align: center;margin-top: 10px ; margin-bottom: 10px">
+																<button id="btnLoadMore4" type="button" class="btn btn-primary" style="width:200px;" onclick="loadmore(3)">Load More</button>
+														</div>
+													</div>
+												</div>
+										</li>
+
+												
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col s12 m3" id="menubar-modal1" style="margin-left: 75%; position: 	fixed">
+						<div class="container">
+							<ul id="metaTimeList" class="collection">
+								<li class="collection-item"> IPCAM1<span style = "background-color: red" class="new badge" id="notify1"></span></li>
+								<li class="collection-item"> IPCAM2<span style = "background-color: red" class="new badge" id="notify2"></span></li>
+								<li class="collection-item"> IPCAM3<span style = "background-color: red" class="new badge" id="notify3"></span></li>
+								<li class="collection-item"> IPCAM4<span style = "background-color: red" class="new badge" id="notify4"></span></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat" onclick="stopReID()">Go Back</a>
+		</div>
+	</div>
+
+    <!-- Modal Structure 2-->
+	<div id="modal2" class="modal modal-fixed-footer" top=3% style="width: 99%; height: 90%;" >
+		<div class="modal-content">
+			<h4>History</h4>
+			<div class="container" style="width: 100%">
+				<div class="row">
+					<div class="col s12 m12">
+						<div class="row">
+							<div class="col s12">
+								<div class="row" id="modalRow2">
+									<ul class="collapsible" data-collapsible="expandable" id="ResultCamSection_back"></ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Go Back</a>
+		</div>
+	</div>
+	
+	<div id="modal3" class="modal modal-fixed-footer" style="width: 99%; height: 90%;" >
+		<div class="modal-content">
+			<div class="container" style="width: 100%; ">
+				<input style = " width: 75%; margin-left: auto; display: block;	margin-right: auto; margin-top: 2%; margin-bottom:auto; outline: none" id="song-image" type="image" onclick="closeModal3()">
+           </div>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Go Back</a>
+		</div>
+	</div>
+
+		
+	<div id="modal4" class="modal modal-fixed-footer" style="width: 500px; height: 200px; min-height: 200px;" >
+		<div class="modal-content">
+			<h4>No Detection</h4>
+			<p>Please Try Again</p>
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">OK</a>
+		</div>
+	</div>
+	
+   <!--  <footer>
+      <div id="verybottom" class="navbar navbar-inverse navbar-fixed-bottom default" role="navigation">
+      	<div style="float: right; margin-top: 11px; margin-right: 20px">
+      		<p><font size="5">&copy All right reserved</font></p>
+      	</div>
+    </footer> -->
+
+    <script type="text/javascript">
+    	var openModal1 = function(){
+    	    $('#modal1').openModal({
+    	      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    	      opacity: .5, // Opacity of modal background
+    	      inDuration: 300, // Transition in duration
+    	      outDuration: 200, // Transition out duration
+    	      starting_top: '2%',
+    	      ending_top: '0%'
+			});
+			$('#modal1').scroll(function(){
+				if($('#modal1'). scrollTop > 150){
+					$()
+				}
+
+			})
+			//document.getElementById("ResultCamSection").innerHTML = "";
+			//document.getElementById("ResultCamSection").innerHTML = ResultSectionDOM;
+    	};
+		var openModal2 = function(){
+    	    $('#modal2').openModal({
+    	      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    	      opacity: .5, // Opacity of modal background
+    	      inDuration: 300, // Transition in duration
+    	      outDuration: 200, // Transition out duration
+    	      starting_top: '2%',
+    	      ending_top: '0%'
+    	    });
+    	};
+		
+		var openModal3 = function(a){
+			console.log(a.src)
+			 $('#modal3').openModal({
+    	      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    	      opacity: .9, // Opacity of modal background
+    	      inDuration: 300, // Transition in duration
+    	      outDuration: 200, // Transition out duration
+			  preventScrolling: true,	
+    	      starting_top: '2%',
+    	      ending_top: '0%'
+			  
+    	    });
+			var input = document.getElementById('song-image');
+			input.src = a.src;
+		}
+
+		var openModal4 = function(){
+    	    $('#modal4').openModal({
+    	      dismissible: true, // Modal can be dismissed by clicking outside of the modal
+    	      opacity: .5, // Opacity of modal background
+    	      inDuration: 300, // Transition in duration
+    	      outDuration: 200, // Transition out duration
+    	      starting_top: '2%',
+    	      ending_top: '0%'
+    	    });
+    	};
+		
+
+		var closeModal3 = function(){
+			$('#modal3').closeModal();
+		}
+    </script>
+	<script type="text/javascript">
+		white_img = "https://www.publicdomainpictures.net/pictures/30000/velka/plain-white-background.jpg";
+		function CancelCrop(){
+		var timespanID = "timespan" + selectionID;
+		var metaspanID = "metaspan" + selectionID;
+		$('.mycanvas').cropper('destroy');
+		if(connectionStatus == true){
+			document.getElementById(timespanID).style.visibility = "visible";
+		
+		}
+		if(connectionStatus == true && recordingStatus == true){
+			document.getElementById(metaspanID).style.visibility = "visible";
+		}
+		document.getElementById("btnCrop").innerHTML="Crop";
+		}
+		function stopReID(){
+			console.log("Stop Reid");
+			clearInterval(checkResultPeriod);
+			doSend("command","stop_reid");
+		}
+	</script>
+	<script type="text/javascript">
+	crop_counter = 0;
+		function cropper1(){
+			selectionID = 1;
+			var videotagName = "myfullvideo" + selectionID;
+			var CropCanvasID = "#mycanvas" + selectionID;
+			var timespanID = "timespan" + selectionID;
+			var metaspanID = "metaspan" + selectionID;
+			console.log(videotagName);
+			var videoID = document.getElementById(videotagName);
+
+			document.getElementById(timespanID).style.visibility = "hidden";
+			document.getElementById(metaspanID).style.visibility = "hidden";
+			document.getElementById("crop_source").src= white_img;
+	
+
+			if (document.getElementById("btnCrop").innerHTML == "Crop"){
+				$(CropCanvasID).cropper();
+				document.getElementById("btnCrop").innerHTML = "Confirm";
+			}
+			else{
+				if(crop_counter > 0){stopReID();console.log("stopReid");}
+				if(crop_counter > 0){doSend("command","stop_record");}
+				if(crop_counter > 0){doSend("command","start_record");}
+				cropping();
+				document.getElementById("btnCrop").innerHTML = "Crop";
+				checkResultPeriod = setInterval(checkResult, 10000);
+				crop_counter++;
+			}
+			
+		}
+
+		function cropping(){		
+			var timespanID = "timespan" + selectionID;
+			var metaspanID = "metaspan" + selectionID;
+	
+			document.getElementById(timespanID).style.visibility = "hidden";
+			document.getElementById(metaspanID).style.visibility = "hidden";
+
+			var cropwidth = mycanvas1.width = $("#myfullvideo1").width();
+			var cropheight = mycanvas1.height = $("#myfullvideo1").height();
+			var CropCanvasID = "#mycanvas" + selectionID;
+
+			croppedCanvas = $(CropCanvasID).cropper('getCroppedCanvas',{
+					                    width: cropwidth,
+					                    height: cropheight,
+					                    fillColor: '#fff',
+					                    imageSmoothingEnabled: false,
+					                    //imageSmoothingQuality: 'high',
+					                    minCropBoxWidth:50,
+					                    minCropBoxHeight:50,
+					                    });
+			if (croppedCanvas.height <= 50 || croppedCanvas.width <= 50) {
+				console.log("Minimum size reached!");
+				alert('Warning: Current Dimension:' +croppedCanvas.width+'x'+croppedCanvas.height+'\r\nThe cropped image is too small\r\nDear user, be informed that the the cropped image dimension shall larger than 50x50');
+				// Stop resize
+				return false;
+			};
+			result = croppedCanvas.toDataURL("image/jpeg",1);
+			var link = document.createElement("a");
+			link.setAttribute("href", result);
+
+			var date = new Date();
+			date = new Date(date.getTime()-(date.getTimezoneOffset()*60000)).toISOString().slice(0,19).replace('T','-');
+			var fileName = date;
+			link.setAttribute("download", fileName);
+			link.click();
+			//channel1.pausevideotag1();
+			//openModal1();
+			status1 = false;
+			status2 = false;
+			status3 = false;
+			status4 = false;
+			result=result.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+			$(CropCanvasID).cropper("destroy");
+			document.getElementById("btnCrop").innerHTML = "Crop";
+			doSend('img',result);
+			doSend('command', 'get_probe_result');
+			status_nodetect = false;
+			if(connectionStatus == true){
+			document.getElementById(timespanID).style.visibility = "visible";
+		//	img_object_list[0].
+		}
+		if(connectionStatus == true && recordingStatus == true){
+			document.getElementById(metaspanID).style.visibility = "visible";
+		}
+		for(var i = 0 ; i < 4 ; i++){
+				index = i + 1;
+				img_object_list[i].imgtotal = 0; 
+				img_object_list[i].imgSeen = 0; 
+				img_object_list[i].imgUnseen = 0; 
+				img_object_list[i].currentIndex = 0;
+				img_object_list[i].imgList = [];
+				document.getElementById("result"+index).innerHTML = ""
+			}
+			document.getElementById("result1").innerHTML = ""; 
+			img_queue1 = [];
+			img_queue2 = [];
+			img_queue3 = [];
+			img_queue4 = [];
+			document.getElementById("notify1").innerHTML = "";
+		}
+		
+	</script>
+	<script type="text/javascript">
+		(function ($) {
+
+		$.fn.sizeChanged = function (handleFunction) {
+		    var element = this;
+		    var lastWidth = element.width();
+		    var lastHeight = element.height();
+
+		    setInterval(function () {
+		        if (lastWidth === element.width()&&lastHeight === element.height())
+		            return;
+		        if (typeof (handleFunction) == 'function') {
+		            handleFunction({ width: lastWidth, height: lastHeight },
+		                           { width: element.width(), height: element.height() });
+		            lastWidth = element.width();
+		            lastHeight = element.height();
+		        }
+		    }, 100);
+
+
+		    return element;
+		};
+
+		}(jQuery));
+	</script>
+
+
+    <script type="text/javascript">
+    	function SetCanvasSize(){
+    		var canvas1 = document.getElementById("mycanvas1");
+    		var canvas2 = document.getElementById("mycanvas2");
+    		//var canvas3 = document.getElementById("mycanvas3");
+    		//var canvas4 = document.getElementById("mycanvas4");
+
+    		mycanvas1.width = $("#myfullvideo1").width();
+    		mycanvas2.width = $("#myfullvideo1").width();
+    		//mycanvas3.width = $("#myfullvideo1").width();
+    		//mycanvas4.width = $("#myfullvideo1").width();
+    		
+    		mycanvas1.height = $("#myfullvideo1").height();
+    		mycanvas2.height = $("#myfullvideo1").height();
+    		//mycanvas3.height = $("#myfullvideo1").height();
+    		//mycanvas4.height = $("#myfullvideo1").height();
+    	}
+    </script>
+	<script>
+		var history_id = 1;
+		var ImgDOM ="<div class='col s12 m6'>"+
+                        "<div class='card'>"+
+                              "<div class='card-image' style='padding: 2px 2px 2px 2px'>"+
+                              "<img src = '%source%' onclick= 'openModal3(this)'>"+
+                              "</div>"+
+                        "</div>"+
+                    "</div>"
+
+            
+		var ResultSectionDOM = 
+		"<li class='active' id='li1' style='display: none'>"+
+		"<div class = 'collapsible-header' id = 'header1' style = 'outline: none; border-radius: 5px; border: 1px solid black'>IPCAM 1 </div>"+
+			"<div class = 'collapsible-body'>"+ 
+				"<div class='clearfix'>"+
+					"<div id = 'result1'></div>"+ 
+					"<div><div class = 'col s12' style='text-align: center; margin-top: 10px'> <button id = 'btnloadmore1' type= 'button' class='btn btn-primary' style = 'width: 200px;'></button></div></div>"+
+				"</div>"+
+			"</div>"+
+		"</li>"+
+		"<li class='active' id='li2' style='display: none'>"+
+		"<div class = 'collapsible-header' id = 'header2' style = 'outline: none; border-radius: 5px; border: 1px solid black'>IPCAM 2 </div>"+
+		"<div class = 'collapsible-body'> <div class='clearfix' id= 'result2'>"+"</div></div>"+
+		"</li>"+
+		"<li class='active' id='li3' style='display: none'>"+
+		"<div class = 'collapsible-header' id = 'header3' style = 'outline: none; border-radius: 5px; border: 1px solid black'>IPCAM 3 </div>"+
+		"<div class = 'collapsible-body'> <div class='clearfix' id= 'result3'>"+"</div></div>"+
+		"</li>"+
+		"<li class='active' id='li4' style='display: none'>"+
+		"<div class = 'collapsible-header' id = 'header4' style = 'outline: none; border-radius: 5px; border: 1px solid black'>IPCAM 4 </div>"+
+		"<div class = 'collapsible-body'> <div class='clearfix' id= 'result4'>"+"</div></div>"+
+		"</li>"	;
+		
+		var ResultSectionDOM_back = 
+		"<li class='active'>"+
+		"<div class = 'collapsible-header active' >[%time%] IPCAM %a% </div>"+
+		"<div class = 'collapsible-body'>"+
+		"%c%"+
+		"</div>"+
+		"</li>";
+			
+		var ModalImage = "<div id = 'myModalImg' class='modal'> "+ 
+						 "<span class='close'>&times;</span>"
+		//<!-- Modal Content (The Image) -->
+		document.getElementById("notify1").addEventListener("click", function(e){
+			img_object_list[0].imgUnseen = img_object_list[0].imgUnseen - 6;
+
+			if(img_object_list[0].imgUnseen < 1){
+				document.getElementById("notify1").innerHTML = "";
+				img_object_list[0].imgUnseen = 0; 
+			}
+
+			if( img_object_list[0].imgUnseen > 99){
+				document.getElementById("notify1").innerHTML = "99+";
+			}
+			if (img_object_list[0].imgUnseen >0 && img_object_list[0].imgUnseen <100){
+				document.getElementById("notify1").innerHTML = img_object_list[0].imgUnseen.toString();
+			}
+	
+		});
+		document.getElementById("notify2").addEventListener("click", function(e){
+			img_object_list[1].imgUnseen = img_object_list[1].imgUnseen - 6;
+		
+			if(img_object_list[1].imgUnseen < 1){
+				document.getElementById("notify2").innerHTML = "";
+				img_object_list[1].imgUnseen = 0; 
+			}
+
+			if( img_object_list[1].imgUnseen > 99){
+				document.getElementById("notify2").innerHTML = "99+";
+			}
+			if (img_object_list[1].imgUnseen >0 && img_object_list[1].imgUnseen <100){
+				document.getElementById("notify2").innerHTML = img_object_list[1].imgUnseen.toString();
+			}
+		
+		});
+		document.getElementById("notify3").addEventListener("click", function(e){
+			img_object_list[2].imgUnseen = img_object_list[2].imgUnseen - 6;
+			if(img_object_list[2].imgUnseen < 1){
+				document.getElementById("notify3").innerHTML = "";
+				img_object_list[2].imgUnseen = 0;
+			}
+			if( img_object_list[2].imgUnseen > 99){
+				document.getElementById("notify3").innerHTML = "99+";
+			}
+			if (img_object_list[2].imgUnseen >0 && img_object_list[2].imgUnseen <100){
+				document.getElementById("notify3").innerHTML = img_object_list[2].imgUnseen.toString();
+			}
+	
+		});
+		document.getElementById("notify4").addEventListener("click", function(e){
+			img_object_list[3].imgUnseen = img_object_list[3].imgUnseen - 6;
+			
+			if(img_object_list[3].imgUnseen < 0){
+				document.getElementById("notify4").innerHTML = "";
+				img_object_list[3].imgUnseen = 0;
+			}
+			if( img_object_list[3].imgUnseen > 99){
+				document.getElementById("notify4").innerHTML = "99+";
+			}
+			if (img_object_list[3].imgUnseen >0 && img_object_list[3].imgUnseen <100){
+				document.getElementById("notify4").innerHTML = img_object_list[3].imgUnseen.toString();
+			}
+		});
+
+		function loadmore(id) {
+			var no = parseInt(id,10) + 1;
+			var notifyid = "notify"+ no;
+			var resultid = "result"+no;
+			console.log("HIHI");
+			if(img_object_list[id].imgUnseen < 6 && img_object_list[id].imgUnseen != 0){
+				var imgstring = "";
+				for(var i = 0 ; i < img_object_list[id].imgUnseen; i++){
+					imgstring = ImgDOM.replace("%source%", img_object_list[id].imgList[img_object_list[id].imgSeen + i]+'? + '+ new Date().getTime());
+					//console.log(img_object_list[id].imgSeen + i);
+					document.getElementById(resultid).innerHTML += imgstring;
+				}
+			}
+			else if(img_object_list[id].imgUnseen == 0){
+				// do nothing
+			}
+			else{
+				var imgstring = "";
+				for(var i = 0 ; i < 6; i++){
+					imgstring = ImgDOM.replace("%source%", img_object_list[id].imgList[img_object_list[id].imgSeen + i]+'? + '+ new Date().getTime());
+					//console.log(img_object_list[id].imgSeen + i);
+					document.getElementById(resultid).innerHTML += imgstring;
+				}
+			}
+
+			img_object_list[id].imgUnseen = img_object_list[id].imgUnseen - 6;
+			if(img_object_list[id].imgUnseen < 0){
+				document.getElementById(notifyid).innerHTML = "";
+				img_object_list[id].imgUnseen = 0;
+			}
+			if( img_object_list[id].imgUnseen > 99){
+				document.getElementById(notifyid).innerHTML = "99+";
+			}
+			if (img_object_list[id].imgUnseen >0 && img_object_list[id].imgUnseen <100){
+				document.getElementById(notifyid).innerHTML = img_object_list[id].imgUnseen.toString();
+			}
+			img_object_list[id].imgSeen = img_object_list[id].imgtotal - img_object_list[id].imgUnseen;
+			console.log(img_object_list[id].imgSeen);
+		} 
+
+
+
+		document.getElementById("metaTimeList").addEventListener("click", function(e){
+		
+        if (e.target && e.target.matches("li.collection-item")) {
+            var index = Array.from(e.target.parentNode.getElementsByClassName("collection-item")).indexOf(e.target) + 1;
+			var time = "";
+			
+    	    var days = new Array("Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat");
+    	    var months = new Array("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+    	    var now = new Date();
+
+    	    time +=  days[now.getDay()] + ", " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear() + " " + now.getHours() +":" + now.getMinutes() + ":" + now.getSeconds();
+    	    
+			var ResultCamSection = document.getElementById("ResultCamSection");
+			var ResultCamSection_back =document.getElementById("ResultCamSection_back");
+
+			if(index == 1){
+				console.log("1 clicked");
+				status1 = true;
+				//ResultCamSection.innerHTML+=ResultSectionDOM.replace(/%a%/g,index);
+				//ResultCamSection_back.innerHTML+=ResultSectionDOM_back.replace(/%a%/g,index).replace(/%time%/g,time).replace(/%id%/g,history_id).replace(/%c%/g, imgstring);
+				//document.getElementById('li1').style.display = 'block';
+				var header = "header"+index;
+				document.getElementById(header).click();
+				history_id++;
+			}
+			if(index == 2){
+				console.log("2 clicked");
+				status2 = true;
+				//document.getElementById('li2').style.display = 'block';
+				//ResultCamSection.innerHTML+=ResultSectionDOM.replace(/%a%/g,index);
+				//ResultCamSection_back.innerHTML+=ResultSectionDOM_back.replace(/%a%/g,index).replace(/%time%/g,time).replace(/%id%/g,history_id).replace(/%c%/g, imgstring);
+				history_id++;
+				var header = "header"+index;
+				document.getElementById(header).click();
+			}
+			if(index == 3){
+				console.log("3 clicked");
+				status3 = true;
+				//document.getElementById('li3').style.display = 'block';
+				//ResultCamSection.innerHTML+=ResultSectionDOM.replace(/%a%/g,index);
+				//ResultCamSection_back.innerHTML+=ResultSectionDOM_back.replace(/%a%/g,index).replace(/%time%/g,time).replace(/%id%/g,history_id).replace(/%c%/g, imgstring);
+				history_id++;
+				var header = "header"+index;
+				document.getElementById(header).click();
+			}
+			if(index == 4 ){
+				console.log("4 clicked");
+				status4 = true;
+				//document.getElementById('li4').style.display = 'block';
+				//ResultCamSection.innerHTML+=ResultSectionDOM.replace(/%a%/g,index).replace(/%c%/g, imgstring);;
+				//ResultCamSection_back.innerHTML+=ResultSectionDOM_back.replace(/%a%/g,index).replace(/%time%/g,time).replace(/%id%/g,history_id).replace(/%c%/g, imgstring);
+				history_id++;
+				var header = "header"+index;
+				document.getElementById(header).click();
+			}
+				
+            }
+            });
+
+	</script>
+	<script type="text/javascript">
+	
+	$(".button-collapse").sideNav();
+      
+    	window.onload = function(){
+    		// Set all span hidden
+    		for (var i = 1; i < 2; i++) {
+    			var timespanID = "timespan"+i;
+    			var metaspanID = "metaspan"+i;
+    			var camspanID = "camspan"+i;
+    			document.getElementById(timespanID).style.visibility = "hidden";
+    			document.getElementById(metaspanID).style.visibility = "hidden";
+    			document.getElementById(camspanID).style.visibility = "hidden";
+				MQTTconnect();
+
+			}
+			startWebcam();
+			//StartVideo();
+			// myImage.addEventListener("click", function(){
+			// 	var modalImg = document.getElementById("img1");
+			//         modal.style.display = "block";
+   //  				modalImg.src = this.src;
+   // 			});
+
+
+    		//var selectionBox = document.getElementById('selectionBox');
+			var selectionMenu =        '<select id="multipleSelect" class="icons"><option value="" disabled selected>Choose your option</option>'+
+			                          '<option value="1" data-icon="assets/image/Camera.ico" class="circle">Player 1</option>'+
+			                          '<option value="2" data-icon="assets/image/Camera.ico" class="circle">Player 2</option>'+
+			                          '<option value="3" data-icon="assets/image/Camera.ico" class="circle">Player 3</option>'+
+			                          '<option value="4" data-icon="assets/image/Camera.ico" class="circle">Player 4</option>'+
+			                        '</select>'+
+			                        '<label><b>Crop Channel(Select Crop Channel Here)</b></label>';
+
+
+			selectionID = 1;
+			var videotagName = "myfullvideo" + selectionID;
+			var CropCanvasID = "#mycanvas" + selectionID;
+			var timespanID = "timespan" + selectionID;
+			var metaspanID = "metaspan" + selectionID;
+			//console.log(videotagName);
+			var videoID = document.getElementById(videotagName);
+		
+			document.getElementById(timespanID).style.visibility = "hidden";
+			document.getElementById(metaspanID).style.visibility = "hidden";
+
+			//});
+			
+			SetCanvasSize(); // Initialize
+			$("#myfullvideo1").sizeChanged(function(){			
+				SetCanvasSize();
+			});
+    	}
+	
+    </script>
+  
+
+    <script type="text/javascript">
+    	
+    	function blinker() {
+    		$('#metaspan1').fadeOut(500);
+    		$('#metaspan1').fadeIn(500);
+
+    	//	$('#metaspan2').fadeOut(500);
+    	//	$('#metaspan2').fadeIn(500);
+    		
+    	//	$('#metaspan3').fadeOut(500);
+    	//	$('#metaspan3').fadeIn(500);
+    		
+    	//	$('#metaspan4').fadeOut(500);
+    	//	$('#metaspan4').fadeIn(500);
+    	}
+    	function updateClock() {
+    	    var str = "";
+
+    	    var days = new Array("Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat");
+    	    var months = new Array("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec");
+
+    	    var now = new Date();
+
+    	    str +=  days[now.getDay()] + ", " + now.getDate() + " " + months[now.getMonth()] + " " + now.getFullYear() + " " + now.getHours() +":" + now.getMinutes() + ":" + now.getSeconds();
+    	    document.getElementById("timespan1").innerHTML = str;
+    	}
+    	function Initialize(){
+    		// Set all span visible
+    		//doConnect();
+		}
+		
+		function checkResult(){
+			doSend("command","get_result");
+		}
+
+    </script>
+<script>
+	connectionStatus = false;
+	recordingStatus = false;
+  	var doConnect = function(){
+		var ipAddress = document.getElementById("NVR_IP_Address").value;
+		var port = document.getElementById("NVR_Port").value;
+		var socketID = "ws://"+ ipAddress + ":"+ port + "/"; 
+        websocket = new WebSocket(socketID); // port 4000 is used to connect fake python NUUO
+        websocket.onopen = function(evt) { onOpen(evt) };
+        websocket.onclose = function(evt) { onClose(evt) };
+        websocket.onmessage = function(evt) { parseMessage(evt)}; // modify here
+        websocket.onerror = function(evt) { onError(evt) };
+    };
+	var onOpen = function(evt){
+		for (var i = 1; i < 2; i++) {
+    			var timespanID = "timespan"+i;
+    			//var metaspanID = "metaspan"+i;
+    			var camspanID = "camspan"+i;
+    			document.getElementById(timespanID).style.visibility = "visible";
+    			document.getElementById(camspanID).style.visibility = "visible";
+				inc.innerHTML = "<h5> Connection Status: Connected</h5>";
+				document.getElementById("btnCreateHandle").disabled = true;
+
+    	}
+		connectionStatus = true;
+		StartVideo();
+        console.log("Connection Established [ Server IP: 192.168.0.133 ; Port : 3000 ]\n");
+		setInterval(blinker, 2000);
+    	setInterval(updateClock, 1000);
+    	
+    };
+
+    var onClose = function(evt){
+		
+        console.log("disconnected\n");
+		document.getElementById("btnCreateHandle").disabled = false;
+		connectionStatus = false;
+    };
+	var toastHTML = '<span>I am toast content</span><button class="btn-flat toast-action">Undo</button>';
+
+	function onError(evt){
+		console.log('error: ' + evt.data + '\n');
+		var ipAddress = document.getElementById("NVR_IP_Address").value;
+		var port = document.getElementById("NVR_Port").value;
+		document.getElementById("btnCreateHandle").disabled = false;
+		connectionStatus = false;
+		websocket.close();
+		var alert_msg = "Socket Connection Error\r\n"+ 
+		"Description:\n"+ 
+		"Unable to establish secure connection to Server [" + ipAddress+":" + port + "]\n";
+		//var toastHTML = '<span>I am toast content</span><button class="btn-flat toast-action">Undo</button>';
+
+		//Materialize.toast({html: 'I am a toast', classes: 'rounded'});
+		alert(alert_msg);
+	}
+
+	img_object = {
+		imgUnseen : 0,
+		imgSeen : 0,
+		currentIndex: 0,
+		imgtotal : 0,
+		imgList : []
+	};
+	img_object_list = [];
+	
+	for(var i = 0 ; i < 4 ; ++i){
+		img_object = new Object();
+		img_object.imgUnseen = 0;
+		img_object.imgSeen = 0; 
+		img_object.imgtotal = 0;
+		img_object.imgList =[];
+		img_object_list.push(img_object);
+	}
+	
+	img_queue1 = [];
+	img_queue2 = [];
+	img_queue3 = [];
+	img_queue4 = [];
+	img_queue_temp = [];
+	imgDOM_list1 = [];
+	imgDOM_list2 = [];
+	imgDOM_list3 = [];
+	imgDOM_list4 = [];
+
+	search_key = "ipcam";
+	status_nodetect = false;
+	function parseMessage(evt){
+		console.log(evt.data);
+		if(evt.data.includes("guest-probe")){
+			document.getElementById("crop_source").src = evt.data+'? + '+ new Date().getTime();
+			console.log("HIHI112");
+			status_nodetect = false;
+		}
+		if(evt.data == "try_again"){
+			if(status_nodetect == false){
+				doSend("command", "get_probe_result");
+			}
+		}
+
+		if(evt.data == "no_detection"){
+			//alert("No Person Detected, Please try again");
+			openModal4();
+			status_nodetect = true;
+		}
+
+		var index = evt.data[evt.data.search(search_key)+search_key.length];
+		//console.log(index);
+
+		if(index == "1"){
+	
+			img_queue1.push(evt.data);
+			img_queue1 = img_queue1.filter(function(item, pos) {
+            	return img_queue1.indexOf(item) == pos;
+			})
+			
+			
+			img_object_list[0].imgtotal = img_queue1.length;
+			img_object_list[0].imgUnseen = img_object_list[0].imgtotal - img_object_list[0].imgSeen;
+			img_object_list[0].imgList = img_queue1;
+			
+			if (img_object_list[0].imgUnseen  < 1 ){
+				document.getElementById("notify1").innerHTML = "";
+			}
+			if( img_object_list[0].imgUnseen > 99){
+				document.getElementById("notify1").innerHTML = "99+";
+			}
+			if( img_object_list[0].imgUnseen > 0 && img_object_list[0].imgUnseen < 100){
+				document.getElementById("notify1").innerHTML = img_object_list[0].imgUnseen.toString();
+			}
+
+		}
+    }
+	 var doSend = function(type,msg,ipcam){
+		if(arguments.length == 2){
+			var info ={
+                'type': type,
+                'data': msg
+            }
+		}
+		else if(arguments.length == 3){
+			var info ={
+                'type': type,
+                'data': msg,
+				'ipcam': ipcam
+            }
+		}		
+        websocket.send(JSON.stringify(info));
+		console.log(info);
+        };
+</script>
+
+<!-- <div>
+    <input  id="stream_url" size="36">
+    <button id="set_new_url" onclick = "set_url(new_url)">Set</button>
+</div>
+<div>
+<p style="color:#808080">Enter your rtsp link to the stream, for example: "rtsp://192.168.1.1:554/h264"</p>
+<p style="color:#808080">HHIHI to the stream, for example: "rtsp://192.168.1.1:554/h264"</p>
+</div>
+<video id="test_video" controls autoplay>
+    
+</video>
+<video id="test_video1" controls autoplay>
+    
+</video> -->
+
+<script src="free.player.1.8.js"></script> <!-- Path to pleer js-->
+<script type="text/javascript">
+	function toggleText(){
+		var btnRecord = document.getElementById("btnRecord");
+		
+		if (btnRecord.innerHTML == "Start Record" && connectionStatus == true) {
+			btnRecord.innerHTML = "Stop Record";
+			document.getElementById("metaspan1").style.visibility = "visible"
+    	    //document.getElementById("metaspan2").style.visibility = "visible";
+    	    //document.getElementById("metaspan3").style.visibility = "visible";
+    	    //document.getElementById("metaspan4").style.visibility = "visible";
+			recordingStatus = true;
+			doSend("command","start_record");
+ 		}
+		else{
+			btnRecord.innerHTML = "Start Record";
+			document.getElementById("metaspan1").style.visibility = "hidden"
+    	    //document.getElementById("metaspan2").style.visibility = "hidden";
+    	    //document.getElementById("metaspan3").style.visibility = "hidden";
+    	    //document.getElementById("metaspan4").style.visibility = "hidden";
+			recordingStatus = false;
+			doSend("command","stop_record");
+		}
+	}
+	
+	function StartVideo(){
+		url1 = "rtsp://192.168.0.102:554/test";
+		url2 = "rtsp://192.168.0.95:554/test";
+		url3 = "rtsp://10.65.15.94:554/test";
+		url4 = "rtsp://192.168.0.95:554/test";
+
+
+		myfullvideo1.src = url1;
+		Streamedian.player('myfullvideo1', {socket:"ws://127.0.0.1:8080/ws/"});
+		var player1 = document.getElementById('myfullvideo1');
+
+		myfullvideo2.src = url2
+		Streamedian.player('myfullvideo2', {socket:"ws://127.0.0.1:8080/ws/"});
+		var player2 = document.getElementById('myfullvideo2');
+		
+		//myfullvideo3.src = url3
+		//Streamedian.player('myfullvideo3', {socket:"ws://127.0.0.1:8080/ws/"});
+		//var player3 = document.getElementById('myfullvideo3');
+		
+		//myfullvideo4.src = url4
+		//Streamedian.player('myfullvideo4', {socket:"ws://127.0.0.1:8080/ws/"});
+		//var player4 = document.getElementById('myfullvideo4');
+
+		var canvas1 = document.getElementById("mycanvas1");
+		var canvas2 = document.getElementById("mycanvas2");
+		//var canvas3 = document.getElementById("mycanvas3");
+		//var canvas4 = document.getElementById("mycanvas4");
+
+		var context1 = canvas1.getContext("2d");
+		var context2 = canvas2.getContext("2d");
+		//var context3 = canvas3.getContext("2d");
+		//var context4 = canvas4.getContext("2d");
+
+		myfullvideo1.addEventListener('play',function() {
+			i1=window.setInterval(function() {context1.drawImage(myfullvideo1,0,0,canvas1.width,canvas1.height)},20);},false);
+		myfullvideo1.addEventListener('pause',function() {window.clearInterval(i1);},false);
+		myfullvideo1.addEventListener('ended',function() {clearInterval(i1);},false);
+
+
+		myfullvideo2.addEventListener('play',function() {
+			i2=window.setInterval(function() {context2.drawImage(myfullvideo2,0,0,canvas2.width,canvas2.height)},20);},false);
+		myfullvideo2.addEventListener('pause',function() {window.clearInterval(i2);},false);
+		myfullvideo2.addEventListener('ended',function() {clearInterval(i2);},false);
+
+
+		//myfullvideo3.addEventListener('play',function() {
+		//	i3=window.setInterval(function() {context3.drawImage(myfullvideo3,0,0,canvas3.width,canvas3.height)},20);},false);
+		//myfullvideo3.addEventListener('pause',function() {window.clearInterval(i3);},false);
+		//myfullvideo3.addEventListener('ended',function() {clearInterval(i3);},false);
+
+
+		//myfullvideo4.addEventListener('play',function() {
+		//	i4=window.setInterval(function() {context4.drawImage(myfullvideo4,0,0,canvas4.width,canvas4.height)},20);},false);
+		//myfullvideo4.addEventListener('pause',function() {window.clearInterval(i4);},false);
+		//myfullvideo4.addEventListener('ended',function() {clearInterval(i4);},false);
+
+
+	}
+
+	function stopvideo1(){
+		url1 = "";
+		
+		myfullvideo1.src = url1;
+		Streamedian.player('myfullvideo1', {socket:"ws://127.0.0.1:8080/ws/"});
+		var player1 = document.getElementById('myfullvideo1');
+	}
+
+	function stopvideo2(){
+		url2 = "";
+		myfullvideo2.src = url2
+		Streamedian.player('myfullvideo2', {socket:"ws://127.0.0.1:8080/ws/"});
+		var player2 = document.getElementById('myfullvideo2');
+	}
+
+		
+</script>
+
+<!-- <p>View player log</p> -->
+<div id="logs" style="display:none;"></div>
+<!-- <button class="btn btn-success" onclick="cleanLog()">clear</button><button class="btn btn-success" onclick="scrollLog()">scroll to end</button> -->
+<script type="text/javascript" src="main.js"></script>
+<script src="assets/js/cropper/cropper.js"></script>
+</body>
+</html>
