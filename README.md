@@ -25,8 +25,10 @@ $ node-red
 
 # Usage on Linux (Ubuntu 16.04++)
 Properly install Intel OpenVINO toolkit according to the guide provided by the official website. Installation on ROOT path is highly recommended. Proceed the installation by setting and building all relevant dependencies by continuing the tutorial provided directly by Intel OpenVINO (Important).
+
 Since the toolkit only provides the bare minimum in terms of the re-identification source code, this is where you need to copy and paste the source code provided in this repository to the following path, and build it.
-The location of the source file relevant to this project can be found here, replace the main.cpp with that provided in this repository:
+
+The location of the source file relevant to this project can be found here, replace the main.cpp with that provided in this repository AND copy the header file for base64 encoding (base64.h) into the following folder:
 ```
 $ cd /opt/intel/computer_vision_sdk/inference_engine/samples/crossroad_camera_demo/
 ```
@@ -38,7 +40,17 @@ $ make
 Run each executable individually.
 Camera 1:
 ```
-
+./cam_1 -i <IP-camera-address||Default 0 if USB cam> -m /opt/intel/computer_vision_sdk/deployment_tools/intel_m
+odels/person-detection-retail-0013/FP32/person-detection-retail-0013.xml -m_reid /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-reidentification-retail-0079/FP32/person-reidentification-retail-0079.xml -t 0.8 -t_reid 0.8
+```
+Camera 2:
+```
+./cam_2 -i <IP-camera-address||Default 0 if USB cam> -m /opt/intel/computer_vision_sdk/deployment_tools/intel_m
+odels/person-detection-retail-0013/FP32/person-detection-retail-0013.xml -m_reid /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-reidentification-retail-0079/FP32/person-reidentification-retail-0079.xml -t 0.8 -t_reid 0.8
+```
+Server:
+```
+./server -m /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-detection-retail-0013/FP32/person-detection-retail-0013.xml -m_reid /opt/intel/computer_vision_sdk/deployment_tools/intel_models/person-reidentification-retail-0079/FP32/person-reidentification-retail-0079.xml
 ```
 
 
